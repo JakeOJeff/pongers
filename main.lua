@@ -60,6 +60,41 @@ function love.update(dt)
         BALL.x = BALL.x + dx * BALL.speed * dt
         BALL.y = BALL.y + dy * BALL.speed * dt
     end
+    bounceBall()
+end
+
+function bounceBall()
+    if checkBallCollision() then
+        BALL.angle = math.rad(love.math.random(0, 180))
+    elseif checkBallBorderCollision() then
+        BALL.angle = math.pi - BALL.angle
+    end
+end
+
+function checkBallCollision()
+    for i, v in ipairs(PADDLES) do
+        local closestX = math.max(v.x, math.min(BALL.x, v.x + v.w))
+        local closestY = math.max(v.y, math.min(BALL.y, v.y + v.h))
+
+        local distX = BALL.x - closestX
+        local distY = BALL.y - closestY
+
+        local distanceSquared = distX^2 + distY^2
+
+        if distanceSquared < BALL.rad * BALL.rad then
+            return true
+        end
+
+        return false
+    end
+end
+
+function checkBallBorderCollision()
+    if BALL.y < BALL.rad or BALL.y > wH - BALL.rad then
+        return true
+    end
+
+    return false
 end
 
 function love.keypressed(key)
