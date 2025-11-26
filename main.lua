@@ -6,7 +6,8 @@ function love.load()
         y = wH/2 - 5,
         rad = 10,
         moving = false,
-        angle = 0,
+        angle = math.rad(-90),
+        speed = 300,
         trail = {}
 
     }
@@ -56,11 +57,16 @@ function love.update(dt)
         local dx = math.sin(BALL.angle)
         local dy = math.cos(BALL.angle)
 
-        BALL.x = BALL.x + dx
-        BALL.y = BALL.y + dy
+        BALL.x = BALL.x + dx * BALL.speed * dt
+        BALL.y = BALL.y + dy * BALL.speed * dt
     end
 end
 
+function love.keypressed(key)
+    if key == "e" then
+        BALL.moving = not BALL.moving
+    end
+end
 
 function love.draw()
     for i, v in ipairs(PADDLES) do
