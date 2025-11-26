@@ -60,12 +60,29 @@ function love.update(dt)
         BALL.x = BALL.x + dx * BALL.speed * dt
         BALL.y = BALL.y + dy * BALL.speed * dt
     end
-    bounceBall()w
+    bounceBall()
 end
 
 function bounceBall()
-    if checkBallCollision() then
-        BALL.angle = math.rad(love.math.random(0, 180))
+    local paddleIndex = checkBallCollision()
+
+    if paddleIndex then
+        local v = PADDLES[paddleIndex]
+
+        BALL.angle = -BALL.angle
+
+
+        if BALL.x < v.x + v.w * 0.5 then
+            BALL.x = v.x - BALL.rad - 1
+        else
+            BALL.x = v.x + v.w + BALL.rad + 1
+        end
+
+
+        local relY = (BALL.y - v.y)/v.h 
+        local hitFactor = (relY - 0.5) * math.rad(60)
+
+        BALL.angle = BALL.angle + hitFactor
     elseif checkBallBorderCollision() then
         BALL.angle = math.pi - BALL.angle
     end
@@ -82,7 +99,7 @@ function checkBallCollision()
         local distanceSquared = distX^2 + distY^2
 
         if distanceSquared < BALL.rad * BALL.rad then
-            return true
+            return i
         end
 
     end
@@ -95,6 +112,10 @@ function checkBallBorderCollision()
     end
 
     return false
+end
+
+function checkOutOfBounds()
+    
 end
 
 function love.keypressed(key)
