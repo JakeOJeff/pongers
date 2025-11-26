@@ -1,6 +1,15 @@
 function love.load()
     wW, wH = love.graphics.getDimensions()
+    GAME_START = false
+    BALL = {
+        x = wW/2 - 5,
+        y = wH/2 - 5,
+        rad = 10,
+        moving = false,
+        angle = 0,
+        trail = {}
 
+    }
     PADDLES = {
         {
             posKey = "s",
