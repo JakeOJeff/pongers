@@ -1,5 +1,6 @@
 function love.load()
     wW, wH = love.graphics.getDimensions()
+
     PADDLES = {
         {
             posKey = "s",
@@ -13,18 +14,33 @@ function love.load()
                 {10, wH - 10}
             },
             speed = 200 -- Second Wise
+        },
+        {
+            posKey = "down",
+            negKey = "up",
+            x = wW - 30,
+            y = 10,
+            w = 20,
+            h = 60,
+            ranges = {
+                {wW - 10, 10},
+                {wW - 10, wH - 10}
+            },
+            speed = 200 -- Second Wise
         }
     }
+
+
 end
 
 function love.update(dt)
     for i, v in ipairs(PADDLES) do
         if love.keyboard.isDown(v.posKey) then
-            v.x = math.min(v.ranges[2][1], v.x + 10 * dt)
-            v.y = math.min(v.ranges[2][2], v.y + 10 * dt)
+            if v.ranges[1][1] ~= v.ranges[2][1] then v.x = math.min(v.ranges[2][1] - v.w, v.x + v.speed * dt) end
+            if v.ranges[1][2] ~= v.ranges[2][2] then v.y = math.min(v.ranges[2][2] - v.h, v.y + v.speed * dt) end
         elseif love.keyboard.isDown(v.negKey) then
-            v.x = math.max(v.ranges[1][1], v.x - 10 * dt)
-            v.y = math.max(v.ranges[1][2], v.y - 10 * dt)
+            if v.ranges[1][1] ~= v.ranges[2][1] then v.x = math.max(v.ranges[1][1], v.x - v.speed * dt) end
+            if v.ranges[1][2] ~= v.ranges[2][2] then v.y = math.max(v.ranges[1][2], v.y - v.speed * dt) end
         end
     end
 end
