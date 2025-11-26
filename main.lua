@@ -115,7 +115,11 @@ function checkBallBorderCollision()
 end
 
 function checkOutOfBounds()
-    
+    if BALL.x > wW then
+        return 2
+    elseif BALL.x < 0 then
+        return 1
+    end
 end
 
 function love.keypressed(key)
