@@ -60,7 +60,7 @@ function love.update(dt)
         BALL.x = BALL.x + dx * BALL.speed * dt
         BALL.y = BALL.y + dy * BALL.speed * dt
     end
-    bounceBall()
+    bounceBall()w
 end
 
 function bounceBall()
@@ -85,8 +85,8 @@ function checkBallCollision()
             return true
         end
 
-        return false
     end
+    return false
 end
 
 function checkBallBorderCollision()
