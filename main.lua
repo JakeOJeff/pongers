@@ -52,11 +52,20 @@ function love.update(dt)
             if v.ranges[1][2] ~= v.ranges[2][2] then v.y = math.max(v.ranges[1][2], v.y - v.speed * dt) end
         end
     end
+    if BALL.moving then
+        local dx = math.sin(BALL.angle)
+        local dy = math.cos(BALL.angle)
+
+        BALL.x = BALL.x + dx
+        BALL.y = BALL.y + dy
+    end
 end
+
 
 function love.draw()
     for i, v in ipairs(PADDLES) do
         love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
     end
+    love.graphics.circle("fill", BALL.x, BALL.y, BALL.rad)
 end
 
