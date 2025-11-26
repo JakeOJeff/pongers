@@ -15,6 +15,7 @@ function love.load()
         {
             posKey = "s",
             negKey = "w",
+            score = 0,
             x = 10,
             y = 10,
             w = 20,
@@ -28,6 +29,7 @@ function love.load()
         {
             posKey = "down",
             negKey = "up",
+            score = 0,
             x = wW - 30,
             y = 10,
             w = 20,
@@ -65,13 +67,15 @@ end
 
 function bounceBall()
     local paddleIndex = checkBallCollision()
+    local outOfBounds = checkOutOfBounds()
 
     if paddleIndex then
         local v = PADDLES[paddleIndex]
+        v.score = v.score + 1
 
         BALL.angle = -BALL.angle
 
-
+        -- CLAMPER
         if BALL.x < v.x + v.w * 0.5 then
             BALL.x = v.x - BALL.rad - 1
         else
@@ -83,6 +87,9 @@ function bounceBall()
         local hitFactor = (relY - 0.5) * math.rad(60)
 
         BALL.angle = BALL.angle + hitFactor
+        
+    elseif outOfBounds then
+        love.load()
     elseif checkBallBorderCollision() then
         BALL.angle = math.pi - BALL.angle
     end
@@ -131,6 +138,7 @@ end
 function love.draw()
     for i, v in ipairs(PADDLES) do
         love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
+        love.graphics.print(v.score, v.x - 5, v.y - 5)
     end
     love.graphics.circle("fill", BALL.x, BALL.y, BALL.rad)
 end
