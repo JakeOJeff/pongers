@@ -4,7 +4,7 @@ function love.load()
     BALL = {
         x = wW/2 - 5,
         y = wH/2 - 5,
-        rad = 10,
+        rad = 40,
         moving = false,
         angle = math.rad(-90),
         speed = 300,
@@ -46,6 +46,11 @@ function love.load()
 end
 
 function love.update(dt)
+
+    if #BALL.trail > 50 then
+        table.remove(BALL.trail, 1)
+        table.remove(BALL.trail, 1)
+    end
     for i, v in ipairs(PADDLES) do
         if love.keyboard.isDown(v.posKey) then
             if v.ranges[1][1] ~= v.ranges[2][1] then v.x = math.min(v.ranges[2][1] - v.w, v.x + v.speed * dt) end
@@ -62,6 +67,8 @@ function love.update(dt)
         BALL.x = BALL.x + dx * BALL.speed * dt
         BALL.y = BALL.y + dy * BALL.speed * dt
     end
+    table.insert(BALL.trail, BALL.x)
+    table.insert(BALL.trail, BALL.y)
     bounceBall()
 end
 
@@ -139,6 +146,9 @@ function love.draw()
     for i, v in ipairs(PADDLES) do
         love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
         love.graphics.print(v.score, v.x - 5, v.y - 5)
+    end
+    if #BALL.trail >= 4 then
+        love.graphics.line(BALL.trail)
     end
     love.graphics.circle("fill", BALL.x, BALL.y, BALL.rad)
 end
