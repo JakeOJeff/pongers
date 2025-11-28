@@ -1,10 +1,12 @@
 function love.load()
     wW, wH = love.graphics.getDimensions()
     GAME_START = false
+    PADDLE_IMG = love.graphics.newImage("paddle.png")
+    BALL_IMG = love.graphics.newImage("ball.png")
     BALL = {
         x = wW/2 - 5,
         y = wH/2 - 5,
-        rad = 40,
+        rad = 10,
         moving = false,
         angle = math.rad(-90),
         speed = 300,
@@ -19,7 +21,7 @@ function love.load()
             x = 10,
             y = 10,
             w = 20,
-            h = 60,
+            h = 100,
             ranges = {
                 {10, 10},
                 {10, wH - 10}
@@ -33,7 +35,7 @@ function love.load()
             x = wW - 30,
             y = 10,
             w = 20,
-            h = 60,
+            h = 100,
             ranges = {
                 {wW - 10, 10},
                 {wW - 10, wH - 10}
@@ -42,7 +44,7 @@ function love.load()
         }
     }
 
-
+    love.graphics.setDefaultFilter("nearest", "nearest")
 end
 
 function love.update(dt)
@@ -144,12 +146,17 @@ end
 
 function love.draw()
     for i, v in ipairs(PADDLES) do
-        love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
+        -- love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
+        love.graphics.draw(PADDLE_IMG, v.x, v.y)
         love.graphics.print(v.score, v.x - 5, v.y - 5)
     end
     if #BALL.trail >= 4 then
         love.graphics.line(BALL.trail)
     end
-    love.graphics.circle("fill", BALL.x, BALL.y, BALL.rad)
+    -- love.graphics.circle("fill", BALL.x, BALL.y, BALL.rad)
+    love.graphics.push()
+    love.graphics.translate(-BALL.rad, -BALL.rad)
+    love.graphics.draw(BALL_IMG, BALL.x, BALL.y)
+    love.graphics.pop()
 end
 
