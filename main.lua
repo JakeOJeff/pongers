@@ -5,6 +5,7 @@ function love.load()
     PADDLE2_IMG = love.graphics.newImage("paddle2.png")
     BALL_IMG = love.graphics.newImage("ball.png")
     DEPTH = -15
+    FONT = love.graphics.newFont("vcr.ttf", 30)
     BALL = {
         x = wW / 2 - 5,
         y = wH / 2 - 5,
@@ -29,6 +30,8 @@ function love.load()
                 { 10, wH - 10 }
             },
             img = PADDLE_IMG,
+            color = { 0.7019607843137254, 0.8901960784313725, 0.38823529411764707 },
+            scorePos = { wW / 2 - FONT:getWidth() - 10, 30 },
             speed = 200 -- Second Wise
         },
         {
@@ -44,6 +47,8 @@ function love.load()
                 { wW - 10, wH - 10 }
             },
             img = PADDLE2_IMG,
+            color = { 0.9215686274509803, 0.5607843137254902, 0.2823529411764706 },
+            scorePos = { wW / 2 + FONT:getWidth() + 10, 30 },
             speed = 200 -- Second Wise
         }
     }
@@ -169,17 +174,17 @@ function love.draw()
         love.graphics.draw(v.img, v.x + DEPTH, v.y)
         if PADDLE_EFFECT.enabled and PADDLE_EFFECT.hitPaddle == v then
             love.graphics.setColor(1, 1, 1, 1 - (PADDLE_EFFECT.scale / PADDLE_EFFECT.maxScale))
-            local ox, oy = v.x + v.w/2, v.y + v.h/2
+            local ox, oy = v.x + v.w / 2, v.y + v.h / 2
             love.graphics.push()
             love.graphics.translate(ox, oy)
             love.graphics.scale(PADDLE_EFFECT.scale, PADDLE_EFFECT.scale)
-            love.graphics.draw(v.img, -v.w/2, -v.h/2)
+            love.graphics.draw(v.img, -v.w / 2, -v.h / 2)
             love.graphics.pop()
         end
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(v.img, v.x, v.y)
-        love.graphics.print(v.score, v.x - 5, v.y - 5)
     end
+
     if #BALL.trail >= 4 then
         love.graphics.line(BALL.trail)
     end
