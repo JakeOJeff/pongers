@@ -7,8 +7,8 @@ function love.load()
     DEPTH = -15
     FONT = love.graphics.newFont("vcr.ttf", 30)
     BALL = {
-        x = wW / 2 - 5,
-        y = wH / 2 - 5,
+        x = wW / 2,
+        y = wH / 2 ,
         rad = 20,
         moving = false,
         angle = math.rad(-90),
@@ -31,14 +31,15 @@ function love.load()
             },
             img = PADDLE_IMG,
             color = { 0.7019607843137254, 0.8901960784313725, 0.38823529411764707 },
-            scorePos = { wW / 2 - FONT:getWidth() - 10, 30 },
+            colorDark = {0.1843137254901961,0.5294117647058824, 0.20784313725490197 },
+            scorePos = { wW / 2 - FONT:getWidth("10") - 10, 30 },
             speed = 200 -- Second Wise
         },
         {
             posKey = "down",
             negKey = "up",
             score = 0,
-            x = wW - 50,
+            x = wW - 40,
             y = 10,
             w = 30,
             h = 100,
@@ -48,7 +49,8 @@ function love.load()
             },
             img = PADDLE2_IMG,
             color = { 0.9215686274509803, 0.5607843137254902, 0.2823529411764706 },
-            scorePos = { wW / 2 + FONT:getWidth() + 10, 30 },
+            colorDark = {0.7803921568627451,0.3215686274509804,0.2235294117647059},
+            scorePos = { wW / 2 + FONT:getWidth("10") + 10, 30 },
             speed = 200 -- Second Wise
         }
     }
@@ -60,6 +62,22 @@ function love.load()
     }
 
     love.graphics.setDefaultFilter("nearest", "nearest")
+end
+
+function resetState()
+    BALL = {
+        x = wW / 2,
+        y = wH / 2 ,
+        rad = 20,
+        moving = false,
+        angle = math.rad(-90),
+        speed = 300,
+        trail = {}
+
+    }
+    for i, v in ipairs(PADDLES) do
+        v.y = 10
+    end
 end
 
 function love.update(dt)
@@ -99,6 +117,12 @@ function bounceBall()
     local paddleIndex = checkBallCollision()
     local outOfBounds = checkOutOfBounds()
 
+    if outOfBounds == 1 then
+        PADDLES[2].score = PADDLES[2].score + 10
+    elseif outOfBounds == 2 then
+        PADDLES[1].score = PADDLES[1].score + 10
+    end
+
     if paddleIndex then
         local v = PADDLES[paddleIndex]
         v.score = v.score + 1
@@ -121,7 +145,7 @@ function bounceBall()
 
         BALL.angle = BALL.angle + hitFactor
     elseif outOfBounds then
-        love.load()
+        resetState()
     elseif checkBallBorderCollision() then
         BALL.angle = math.pi - BALL.angle
     end
@@ -167,6 +191,7 @@ function love.keypressed(key)
 end
 
 function love.draw()
+    love.graphics.print(BALL.angle)
     love.graphics.setBackgroundColor(0.45098039215686275, 0.8745098039215686, 0.9490196078431372)
     for i, v in ipairs(PADDLES) do
         -- love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
@@ -183,6 +208,11 @@ function love.draw()
         end
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(v.img, v.x, v.y)
+        love.graphics.setFont(FONT)
+        love.graphics.setColor(v.colorDark)
+        love.graphics.print(v.score, v.scorePos[1], v.scorePos[2] + 3)
+        love.graphics.setColor(v.color)
+        love.graphics.print(v.score, v.scorePos[1], v.scorePos[2])
     end
 
     if #BALL.trail >= 4 then
@@ -196,4 +226,6 @@ function love.draw()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(BALL_IMG, BALL.x, BALL.y)
     love.graphics.pop()
+
+    love.graphics.line(wW/2, 0, wW/2, wH)
 end
