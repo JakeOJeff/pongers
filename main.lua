@@ -6,7 +6,7 @@ function love.load()
     BALL = {
         x = wW/2 - 5,
         y = wH/2 - 5,
-        rad = 10,
+        rad = 20,
         moving = false,
         angle = math.rad(-90),
         speed = 300,
@@ -20,7 +20,7 @@ function love.load()
             score = 0,
             x = 10,
             y = 10,
-            w = 20,
+            w = 30,
             h = 100,
             ranges = {
                 {10, 10},
@@ -32,9 +32,9 @@ function love.load()
             posKey = "down",
             negKey = "up",
             score = 0,
-            x = wW - 30,
+            x = wW - 50,
             y = 10,
-            w = 20,
+            w = 30,
             h = 100,
             ranges = {
                 {wW - 10, 10},
