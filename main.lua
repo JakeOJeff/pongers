@@ -8,7 +8,7 @@ function love.load()
     FONT = love.graphics.newFont("vcr.ttf", 30)
     BALL = {
         x = wW / 2,
-        y = wH / 2 ,
+        y = wH / 2,
         rad = 20,
         moving = false,
         angle = math.rad(-90),
@@ -31,7 +31,7 @@ function love.load()
             },
             img = PADDLE_IMG,
             color = { 0.7019607843137254, 0.8901960784313725, 0.38823529411764707 },
-            colorDark = {0.1843137254901961,0.5294117647058824, 0.20784313725490197 },
+            colorDark = { 0.1843137254901961, 0.5294117647058824, 0.20784313725490197 },
             scorePos = { wW / 2 - FONT:getWidth("10") - 10, 30 },
             speed = 200 -- Second Wise
         },
@@ -49,7 +49,7 @@ function love.load()
             },
             img = PADDLE2_IMG,
             color = { 0.9215686274509803, 0.5607843137254902, 0.2823529411764706 },
-            colorDark = {0.7803921568627451,0.3215686274509804,0.2235294117647059},
+            colorDark = { 0.7803921568627451, 0.3215686274509804, 0.2235294117647059 },
             scorePos = { wW / 2 + FONT:getWidth("10") + 10, 30 },
             speed = 200 -- Second Wise
         }
@@ -60,14 +60,14 @@ function love.load()
         maxScale = 2,
         hitPaddle = nil
     }
-
+    LAST_PADDLE = nil
     love.graphics.setDefaultFilter("nearest", "nearest")
 end
 
 function resetState()
     BALL = {
         x = wW / 2,
-        y = wH / 2 ,
+        y = wH / 2,
         rad = 20,
         moving = false,
         angle = math.rad(-90),
@@ -85,6 +85,7 @@ function love.update(dt)
         table.remove(BALL.trail, 1)
         table.remove(BALL.trail, 1)
     end
+
     if PADDLE_EFFECT.enabled and PADDLE_EFFECT.scale < PADDLE_EFFECT.maxScale then
         PADDLE_EFFECT.scale = PADDLE_EFFECT.scale + 5 * dt
     end
@@ -101,6 +102,22 @@ function love.update(dt)
             if v.ranges[1][2] ~= v.ranges[2][2] then v.y = math.max(v.ranges[1][2], v.y - v.speed * dt) end
         end
     end
+
+    AIReaction = 0.1
+    local timer = 0
+    timer = timer + dt
+    local targetY = 0
+    if AIReaction > timer then
+        targetY = BALL.y + math.tan(BALL.angle) * (BALL.x - PADDLES[2].x)
+        timer = 0
+    end
+    local speed = 1000 -- tweak this per difficulty
+    if PADDLES[2].y < targetY and PADDLES[2].y + PADDLES[2].h < wH - 10 then
+        PADDLES[2].y = PADDLES[2].y + speed * dt
+    elseif PADDLES[2].y > targetY and PADDLES[2].y > 10 then
+        PADDLES[2].y = PADDLES[2].y - speed * dt
+    end
+    
     if BALL.moving then
         local dx = math.sin(BALL.angle)
         local dy = math.cos(BALL.angle)
@@ -129,6 +146,7 @@ function bounceBall()
         PADDLE_EFFECT.hitPaddle = v
         PADDLE_EFFECT.enabled = true
         PADDLE_EFFECT.scale = 1
+        LAST_PADDLE = v
 
         BALL.angle = -BALL.angle
 
@@ -227,5 +245,5 @@ function love.draw()
     love.graphics.draw(BALL_IMG, BALL.x, BALL.y)
     love.graphics.pop()
 
-    love.graphics.line(wW/2, 0, wW/2, wH)
+    love.graphics.line(wW / 2, 0, wW / 2, wH)
 end
