@@ -1,5 +1,6 @@
 function love.load()
     wW, wH = love.graphics.getDimensions()
+    AI = require("ai")
     GAME_START = false
     PADDLE_IMG = love.graphics.newImage("paddle.png")
     PADDLE2_IMG = love.graphics.newImage("paddle2.png")
@@ -81,6 +82,8 @@ function resetState()
 end
 
 function love.update(dt)
+
+    AI:update(dt)
     if #BALL.trail > 50 then
         table.remove(BALL.trail, 1)
         table.remove(BALL.trail, 1)
@@ -103,21 +106,8 @@ function love.update(dt)
         end
     end
 
-    AIReaction = 0.1
-    local timer = 0
-    timer = timer + dt
-    local targetY = 0
-    if AIReaction > timer then
-        targetY = BALL.y + math.tan(BALL.angle) * (BALL.x - PADDLES[2].x)
-        timer = 0
-    end
-    local speed = 1000 -- tweak this per difficulty
-    if PADDLES[2].y < targetY and PADDLES[2].y + PADDLES[2].h < wH - 10 then
-        PADDLES[2].y = PADDLES[2].y + speed * dt
-    elseif PADDLES[2].y > targetY and PADDLES[2].y > 10 then
-        PADDLES[2].y = PADDLES[2].y - speed * dt
-    end
-    
+    PADDLES[2].y = AI.targetY
+
     if BALL.moving then
         local dx = math.sin(BALL.angle)
         local dy = math.cos(BALL.angle)
