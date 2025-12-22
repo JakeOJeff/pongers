@@ -7,6 +7,8 @@ function love.load()
     BALL_IMG = love.graphics.newImage("ball.png")
     DEPTH = -15
     FONT = love.graphics.newFont("vcr.ttf", 30)
+    bgShader = love.graphics.newShader("background.glsl")
+
     BALL = {
         x = wW / 2,
         y = wH / 2,
@@ -82,7 +84,6 @@ function resetState()
 end
 
 function love.update(dt)
-
     AI:update(dt)
     if #BALL.trail > 50 then
         table.remove(BALL.trail, 1)
@@ -199,6 +200,12 @@ function love.keypressed(key)
 end
 
 function love.draw()
+    bgShader:send("time", love.timer.getTime())
+    bgShader:send("resolution", {love.graphics.getWidth(), love.graphics.getHeight()})
+
+    love.graphics.setShader(bgShader)
+    love.graphics.rectangle("fill", 0, 0, wW, wH)
+    love.graphics.setShader()
     love.graphics.print(BALL.angle)
     love.graphics.setBackgroundColor(0.45098039215686275, 0.8745098039215686, 0.9490196078431372)
     for i, v in ipairs(PADDLES) do
