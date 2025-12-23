@@ -3,7 +3,7 @@
         
         // Colors
         const vec3 color1 = vec3(0.451, 0.875, 0.949);
-        const vec3 color2 = vec3(0.271, 0.525, 0.569); // Darker version
+        const vec3 color2 = vec3(0.351, 0.775, 0.849); // Darker version
         
         vec4 effect(vec4 color, Image tex, vec2 tc, vec2 sc) {
             vec2 uv = sc / resolution;

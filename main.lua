@@ -134,6 +134,7 @@ function bounceBall()
     if paddleIndex then
         local v = PADDLES[paddleIndex]
         v.score = v.score + 1
+        BALL.speed = BALL.speed * 1.1
         PADDLE_EFFECT.hitPaddle = v
         PADDLE_EFFECT.enabled = true
         PADDLE_EFFECT.scale = 1
