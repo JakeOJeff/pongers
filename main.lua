@@ -1,6 +1,7 @@
 function love.load()
     wW, wH = love.graphics.getDimensions()
     AI = require("ai")
+    GUI = require("gui")
     GAME_START = false
     PADDLE_IMG = love.graphics.newImage("paddle.png")
     PADDLE2_IMG = love.graphics.newImage("paddle2.png")
@@ -35,7 +36,7 @@ function love.load()
             img = PADDLE_IMG,
             color = { 0.7019607843137254, 0.8901960784313725, 0.38823529411764707 },
             colorDark = { 0.1843137254901961, 0.5294117647058824, 0.20784313725490197 },
-            scorePos = { wW / 2 - FONT:getWidth("10") - 10, 30 },
+            scorePos = { wW / 2 - FONT:getWidth("10") - 20, 30 },
             speed = 200 -- Second Wise
         },
         {
@@ -53,7 +54,7 @@ function love.load()
             img = PADDLE2_IMG,
             color = { 0.9215686274509803, 0.5607843137254902, 0.2823529411764706 },
             colorDark = { 0.7803921568627451, 0.3215686274509804, 0.2235294117647059 },
-            scorePos = { wW / 2 + FONT:getWidth("10") + 10, 30 },
+            scorePos = { wW / 2 + FONT:getWidth("10"), 30 },
             speed = 200 -- Second Wise
         }
     }
@@ -85,6 +86,7 @@ end
 
 function love.update(dt)
     AI:update(dt)
+    GUI:update()
     if #BALL.trail > 50 then
         table.remove(BALL.trail, 1)
         table.remove(BALL.trail, 1)
@@ -121,6 +123,9 @@ function love.update(dt)
     bounceBall()
 end
 
+function love.mousepressed(x, y, button)
+    GUI:mousepressed(x, y, button)
+end
 function bounceBall()
     local paddleIndex = checkBallCollision()
     local outOfBounds = checkOutOfBounds()
@@ -207,8 +212,7 @@ function love.draw()
     love.graphics.setShader(bgShader)
     love.graphics.rectangle("fill", 0, 0, wW, wH)
     love.graphics.setShader()
-    love.graphics.print(BALL.angle)
-    love.graphics.setBackgroundColor(0.45098039215686275, 0.8745098039215686, 0.9490196078431372)
+    -- love.graphics.setBackgroundColor(0.45098039215686275, 0.8745098039215686, 0.9490196078431372)
     for i, v in ipairs(PADDLES) do
         -- love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
         love.graphics.setColor(0, 0, 0, 0.1)
@@ -232,6 +236,10 @@ function love.draw()
     end
 
     if #BALL.trail >= 4 then
+        if LAST_PADDLE then
+                    love.graphics.setColor(LAST_PADDLE.color)
+
+        end
         love.graphics.line(BALL.trail)
     end
     -- love.graphics.circle("fill", BALL.x, BALL.y, BALL.rad)
@@ -244,4 +252,6 @@ function love.draw()
     love.graphics.pop()
 
     love.graphics.line(wW / 2, 0, wW / 2, wH)
+
+    GUI:draw()
 end
