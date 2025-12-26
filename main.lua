@@ -15,6 +15,7 @@ function love.load()
     TCOUNT = 20
     TSIZE = wH/TCOUNT
     TRANSIT = false
+    TIMER = 0
 
     for i = 1, TCOUNT do
         table.insert({
@@ -120,16 +121,6 @@ function resetState()
     end
 end
 
-function screenTransition()
-    for i = 1, TCOUNT do
-        table.insert({
-            x = 0,
-            y = (i - 1) * TSIZE,
-            w = 0,
-            h = TSIZE
-        })
-    end
-end
 
 function love.update(dt)
     AI:update(dt)
@@ -146,6 +137,20 @@ function love.update(dt)
         PADDLE_EFFECT.enabled = false
     end
 
+    if TRANSIT then
+        TIMER = TIMER + 1 * dt
+        if TIMER < 2 do
+            for i = 1, TCOUNT do
+                TBLOCKS[i].w = i * math.sin(love.timer.getTime())
+            end        
+        else
+            TIMER = 0
+            TRANSIT = false
+        end
+    end
+    
+    
+
     for i, v in ipairs(PADDLES) do
         if love.keyboard.isDown(v.posKey) then
             if v.ranges[1][1] ~= v.ranges[2][1] then v.x = math.min(v.ranges[2][1] - v.w, v.x + v.speed * dt) end
@@ -155,6 +160,8 @@ function love.update(dt)
             if v.ranges[1][2] ~= v.ranges[2][2] then v.y = math.max(v.ranges[1][2], v.y - v.speed * dt) end
         end
     end
+
+    
 
     if STATE == "AI" then
         PADDLES[2].y = AI.targetY
@@ -190,7 +197,7 @@ function bounceBall()
     end
 
     if outOfBounds == 1 or outOfBounds == 2 then
-        screenTransition()
+        TRANSIT = true
     end
 
     if paddleIndex then
