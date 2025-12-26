@@ -33,7 +33,8 @@ function love.load()
         moving = false,
         angle = math.rad(-90),
         speed = 300,
-        trail = {}
+        trail = {},
+        timer = 0
 
     }
     PADDLES = {
@@ -122,6 +123,10 @@ function resetState()
 end
 
 function love.update(dt)
+    if BALL.moving then
+            BALL.timer = BALL.timer + 1 * dt
+
+    end
     AI:update(dt)
     GUI:update()
     if #BALL.trail > 50 then
@@ -248,6 +253,7 @@ function checkBallCollision()
         local distanceSquared = distX ^ 2 + distY ^ 2
 
         if distanceSquared < BALL.rad * BALL.rad then
+            BALL.timer = 0
             return i
         end
     end
