@@ -13,12 +13,12 @@ function love.load()
 
     TBLOCKS = {}
     TCOUNT = 20
-    TSIZE = wH/TCOUNT
+    TSIZE = wH / TCOUNT
     TRANSIT = false
     TIMER = 0
 
     for i = 1, TCOUNT do
-        table.insert({
+        table.insert(TBLOCKS, {
             x = 0,
             y = (i - 1) * TSIZE,
             w = 0,
@@ -89,7 +89,7 @@ function love.load()
                 { wW - 10, wH - 10 }
             },
             img = PADDLE2_IMG,
-            color = { 0.9215686274509803, 0.5607843137254902, 0.2823529411764706  },
+            color = { 0.9215686274509803, 0.5607843137254902, 0.2823529411764706 },
             colorDark = { 0.7803921568627451, 0.3215686274509804, 0.2235294117647059 },
             scorePos = { wW / 2 + FONT:getWidth("10"), 30 },
             speed = 200 -- Second Wise
@@ -121,7 +121,6 @@ function resetState()
     end
 end
 
-
 function love.update(dt)
     AI:update(dt)
     GUI:update()
@@ -137,19 +136,25 @@ function love.update(dt)
         PADDLE_EFFECT.enabled = false
     end
 
-    if TRANSIT then
-        TIMER = TIMER + 1 * dt
-        if TIMER < 2 do
-            for i = 1, TCOUNT do
-                TBLOCKS[i].w = i * math.sin(love.timer.getTime())
-            end        
-        else
-            TIMER = 0
-            TRANSIT = false
+if TRANSIT then
+    TIMER = TIMER + dt
+
+    if TIMER < 2 then
+        local t = TIMER / 2
+        for i = 1, TCOUNT do
+            TBLOCKS[i].w = math.sin(t * math.pi) * wW
+        end
+    else
+        TIMER = 0
+        TRANSIT = false
+        for i = 1, TCOUNT do
+            TBLOCKS[i].w = 0
         end
     end
-    
-    
+end
+
+
+
 
     for i, v in ipairs(PADDLES) do
         if love.keyboard.isDown(v.posKey) then
@@ -161,7 +166,7 @@ function love.update(dt)
         end
     end
 
-    
+
 
     if STATE == "AI" then
         PADDLES[2].y = AI.targetY
@@ -169,7 +174,7 @@ function love.update(dt)
     if STATE == "AI GUIDE" then
         PADDLES[3].y = AI.targetY
     end
-    
+
 
     if BALL.moving then
         local dx = math.sin(BALL.angle)
@@ -186,6 +191,7 @@ end
 function love.mousepressed(x, y, button)
     GUI:mousepressed(x, y, button)
 end
+
 function bounceBall()
     local paddleIndex = checkBallCollision()
     local outOfBounds = checkOutOfBounds()
@@ -272,13 +278,13 @@ end
 
 function love.draw()
     bgShader:send("time", love.timer.getTime())
-    bgShader:send("resolution", {love.graphics.getWidth(), love.graphics.getHeight()})
+    bgShader:send("resolution", { love.graphics.getWidth(), love.graphics.getHeight() })
 
     love.graphics.setShader(bgShader)
     love.graphics.rectangle("fill", 0, 0, wW, wH)
     love.graphics.setShader()
     -- love.graphics.setBackgroundColor(0.45098039215686275, 0.8745098039215686, 0.9490196078431372)
-    for i = 1, 2  do
+    for i = 1, 2 do
         -- love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
         v = PADDLES[i]
         love.graphics.setColor(0, 0, 0, 0.1)
@@ -304,12 +310,11 @@ function love.draw()
         love.graphics.setColor(1, 1, 1, 0.5)
         love.graphics.draw(PADDLES[3].img, PADDLES[3].x, PADDLES[3].y)
     end
-            love.graphics.setColor(1, 1, 1 , 1)
+    love.graphics.setColor(1, 1, 1, 1)
 
     if #BALL.trail >= 4 then
         if LAST_PADDLE then
-                    love.graphics.setColor(LAST_PADDLE.color)
-
+            love.graphics.setColor(LAST_PADDLE.color)
         end
         love.graphics.line(BALL.trail)
     end
@@ -325,4 +330,11 @@ function love.draw()
     love.graphics.line(wW / 2, 0, wW / 2, wH)
 
     GUI:draw()
+
+    if TRANSIT then
+        for i = 1, TCOUNT do
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.rectangle("fill", TBLOCKS[i].x, TBLOCKS[i].y, TBLOCKS[i].w, TBLOCKS[i].h)
+        end
+    end
 end
