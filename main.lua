@@ -1,8 +1,12 @@
-function love.load()
     wW, wH = love.graphics.getDimensions()
-    STATE = "AI"
+
     AI = require("ai")
     GUI = require("gui")
+    require("ball")
+
+function love.load()
+    STATE = "AI"
+
     GAME_START = false
     PADDLE_IMG = love.graphics.newImage("paddle.png")
     PADDLE2_IMG = love.graphics.newImage("paddle2.png")
@@ -18,6 +22,12 @@ function love.load()
     TRANSIT = false
     TIMER = 0
 
+    MBLOCKS = {}
+    MCOUNT = 100
+    MSIZE = wW / MCOUNT
+    MTRANSIT = true
+    MTIMER = 0
+
     for i = 1, TCOUNT do
         table.insert(TBLOCKS, {
             x = 0,
@@ -26,7 +36,14 @@ function love.load()
             h = TSIZE
         })
     end
-
+    for i = 1, MCOUNT do
+        table.insert(MBLOCKS, {
+            x = 0,
+            y = (i - 1) * MSIZE,
+            w = 0,
+            h = MSIZE
+        })
+    end
     BALL = {
         x = wW / 2,
         y = wH / 2,
@@ -177,7 +194,22 @@ function love.update(dt)
             end
         end
     end
+    if MTRANSIT then
+        MTIMER = MTIMER + dt
 
+        if MTIMER < 2 then
+            local t = TIMER / 2
+            for i = 1, TCOUNT do
+                MBLOCKS[i].h = math.sin(t * math.pi + i * 0.001) * wH
+            end
+        else
+            MTIMER = 0
+            MTRANSIT = false
+            for i = 1, TCOUNT do
+                TBLOCKS[i].h = 0
+            end
+        end
+    end
     for i, v in ipairs(PADDLES) do
         if love.keyboard.isDown(v.posKey) then
             if v.ranges[1][1] ~= v.ranges[2][1] then v.x = math.min(v.ranges[2][1] - v.w, v.x + v.speed * dt) end
@@ -210,81 +242,6 @@ end
 
 function love.mousepressed(x, y, button)
     GUI:mousepressed(x, y, button)
-end
-
-function bounceBall()
-    local paddleIndex = checkBallCollision()
-    local outOfBounds = checkOutOfBounds()
-    if i == 3 then return end
-    if outOfBounds == 1 then
-        PADDLES[2].score = PADDLES[2].score + 10
-    elseif outOfBounds == 2 then
-        PADDLES[1].score = PADDLES[1].score + 10
-    end
-
-    if paddleIndex then
-        local v = PADDLES[paddleIndex]
-        v.score = v.score + 1
-        BALL.speed = BALL.speed * 1.1
-        PADDLE_EFFECT.hitPaddle = v
-        PADDLE_EFFECT.enabled = true
-        PADDLE_EFFECT.scale = 1
-        LAST_PADDLE = v
-
-        BALL.angle = -BALL.angle
-
-        -- CLAMPER
-        if BALL.x < v.x + v.w * 0.5 then
-            BALL.x = v.x - BALL.rad - 1
-        else
-            BALL.x = v.x + v.w + BALL.rad + 1
-        end
-
-
-        local relY = (BALL.y - v.y) / v.h
-        local hitFactor = (relY - 0.5) * math.rad(60)
-
-        BALL.angle = BALL.angle + hitFactor
-    elseif outOfBounds then
-        resetState()
-    elseif checkBallBorderCollision() then
-        BALL.angle = math.pi - BALL.angle
-    end
-end
-
-function checkBallCollision()
-    for i, v in ipairs(PADDLES) do
-        if i == 3 then return end
-        local closestX = math.max(v.x, math.min(BALL.x, v.x + v.w))
-        local closestY = math.max(v.y, math.min(BALL.y, v.y + v.h))
-
-        local distX = BALL.x - closestX
-        local distY = BALL.y - closestY
-
-        local distanceSquared = distX ^ 2 + distY ^ 2
-
-        if distanceSquared < BALL.rad * BALL.rad then
-            BALL.timer = 0
-            return i
-        end
-    end
-    return false
-end
-
-function checkBallBorderCollision()
-    if BALL.y < BALL.rad or BALL.y > wH - BALL.rad then
-        return true
-    end
-
-    return false
-end
-
-function checkOutOfBounds()
-    if BALL.x > wW then
-        return 2
-    elseif BALL.x < 0 then
-        return 1
-    end
 end
 
 function love.keypressed(key)
@@ -356,5 +313,12 @@ function love.draw()
         -- love.graphics.line(wW / 2, 0, wW / 2, wH)
 
         GUI:draw()
+    end
+
+    if MTRANSIT then
+                for i = 1, MCOUNT do
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.rectangle("fill", TBLOCKS[i].x, TBLOCKS[i].y, TBLOCKS[i].w, TBLOCKS[i].h)
+        end
     end
 end
