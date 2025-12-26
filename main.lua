@@ -8,6 +8,7 @@ function love.load()
     PADDLE2_IMG = love.graphics.newImage("paddle2.png")
     BALL_IMG = love.graphics.newImage("ball.png")
     DEPTH = -15
+    HEIGHT_FACTOR = 0
     FONT = love.graphics.newFont("vcr.ttf", 30)
     bgShader = love.graphics.newShader("background.glsl")
 
@@ -54,7 +55,7 @@ function love.load()
             color = { 0.7019607843137254, 0.8901960784313725, 0.38823529411764707 },
             colorDark = { 0.1843137254901961, 0.5294117647058824, 0.20784313725490197 },
             scorePos = { wW / 2 - FONT:getWidth("10") - 20, 30 },
-            speed = 200 -- Second Wise
+            speed = 300 -- Second Wise
         },
         {
             posKey = "down",
@@ -72,7 +73,7 @@ function love.load()
             color = { 0.9215686274509803, 0.5607843137254902, 0.2823529411764706 },
             colorDark = { 0.7803921568627451, 0.3215686274509804, 0.2235294117647059 },
             scorePos = { wW / 2 + FONT:getWidth("10"), 30 },
-            speed = 200 -- Second Wise
+            speed = 300 -- Second Wise
         }
         -- AI GUIDE
         ,
@@ -93,7 +94,7 @@ function love.load()
             color = { 0.9215686274509803, 0.5607843137254902, 0.2823529411764706 },
             colorDark = { 0.7803921568627451, 0.3215686274509804, 0.2235294117647059 },
             scorePos = { wW / 2 + FONT:getWidth("10"), 30 },
-            speed = 200 -- Second Wise
+            speed = 300 -- Second Wise
         }
     }
     PADDLE_EFFECT = {
@@ -124,6 +125,13 @@ function resetState()
     TRANSIT = true
 end
 
+function resetGame()
+    resetState()
+    for i, v in ipairs(PADDLES) do
+        v.score = 0
+
+    end
+end
 function love.update(dt)
     if BALL.moving then
         BALL.timer = BALL.timer + 1 * dt
@@ -131,6 +139,11 @@ function love.update(dt)
             resetState()
         end
     end
+
+    local offset = 1 - (math.abs(BALL.x - wW / 2) / (wW / 2))
+    offset = math.max(0, offset)
+
+    local HEIGHT_FACTOR = offset * 20  -- tweak this number
 
     AI:update(dt)
     GUI:update()
@@ -280,6 +293,8 @@ end
 function love.keypressed(key)
     if key == "e" then
         BALL.moving = not BALL.moving
+    elseif key == "r" then
+        resetGame()
     end
 end
 
@@ -338,12 +353,12 @@ function love.draw()
         love.graphics.push()
         love.graphics.translate(-BALL.rad, -BALL.rad)
         love.graphics.setColor(0, 0, 0, 0.1)
-        love.graphics.draw(BALL_IMG, BALL.x + DEPTH, BALL.y)
+        love.graphics.draw(BALL_IMG, BALL.x + DEPTH + HEIGHT_FACTOR, BALL.y)
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(BALL_IMG, BALL.x, BALL.y)
         love.graphics.pop()
 
-        love.graphics.line(wW / 2, 0, wW / 2, wH)
+        -- love.graphics.line(wW / 2, 0, wW / 2, wH)
 
         GUI:draw()
     end
