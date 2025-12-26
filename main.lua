@@ -1,5 +1,6 @@
 function love.load()
     wW, wH = love.graphics.getDimensions()
+    STATE = "AI"
     AI = require("ai")
     GUI = require("gui")
     GAME_START = false
@@ -9,6 +10,20 @@ function love.load()
     DEPTH = -15
     FONT = love.graphics.newFont("vcr.ttf", 30)
     bgShader = love.graphics.newShader("background.glsl")
+
+    TBLOCKS = {}
+    TCOUNT = 20
+    TSIZE = wH/TCOUNT
+    TRANSIT = false
+
+    for i = 1, TCOUNT do
+        table.insert({
+            x = 0,
+            y = (i - 1) * TSIZE,
+            w = 0,
+            h = TSIZE
+        })
+    end
 
     BALL = {
         x = wW / 2,
@@ -57,6 +72,27 @@ function love.load()
             scorePos = { wW / 2 + FONT:getWidth("10"), 30 },
             speed = 200 -- Second Wise
         }
+        -- AI GUIDE
+        ,
+        {
+            posKey = "down",
+            negKey = "up",
+            guide = true,
+            score = 0,
+            x = wW - 40,
+            y = 10,
+            w = 30,
+            h = 100,
+            ranges = {
+                { wW - 10, 10 },
+                { wW - 10, wH - 10 }
+            },
+            img = PADDLE2_IMG,
+            color = { 0.9215686274509803, 0.5607843137254902, 0.2823529411764706  },
+            colorDark = { 0.7803921568627451, 0.3215686274509804, 0.2235294117647059 },
+            scorePos = { wW / 2 + FONT:getWidth("10"), 30 },
+            speed = 200 -- Second Wise
+        }
     }
     PADDLE_EFFECT = {
         enabled = false,
@@ -81,6 +117,17 @@ function resetState()
     }
     for i, v in ipairs(PADDLES) do
         v.y = 10
+    end
+end
+
+function screenTransition()
+    for i = 1, TCOUNT do
+        table.insert({
+            x = 0,
+            y = (i - 1) * TSIZE,
+            w = 0,
+            h = TSIZE
+        })
     end
 end
 
@@ -109,7 +156,13 @@ function love.update(dt)
         end
     end
 
-    PADDLES[2].y = AI.targetY
+    if STATE == "AI" then
+        PADDLES[2].y = AI.targetY
+    end
+    if STATE == "AI GUIDE" then
+        PADDLES[3].y = AI.targetY
+    end
+    
 
     if BALL.moving then
         local dx = math.sin(BALL.angle)
@@ -129,11 +182,15 @@ end
 function bounceBall()
     local paddleIndex = checkBallCollision()
     local outOfBounds = checkOutOfBounds()
-
+    if i == 3 then return end
     if outOfBounds == 1 then
         PADDLES[2].score = PADDLES[2].score + 10
     elseif outOfBounds == 2 then
         PADDLES[1].score = PADDLES[1].score + 10
+    end
+
+    if outOfBounds == 1 or outOfBounds == 2 then
+        screenTransition()
     end
 
     if paddleIndex then
@@ -168,6 +225,7 @@ end
 
 function checkBallCollision()
     for i, v in ipairs(PADDLES) do
+        if i == 3 then return end
         local closestX = math.max(v.x, math.min(BALL.x, v.x + v.w))
         local closestY = math.max(v.y, math.min(BALL.y, v.y + v.h))
 
@@ -213,8 +271,9 @@ function love.draw()
     love.graphics.rectangle("fill", 0, 0, wW, wH)
     love.graphics.setShader()
     -- love.graphics.setBackgroundColor(0.45098039215686275, 0.8745098039215686, 0.9490196078431372)
-    for i, v in ipairs(PADDLES) do
+    for i = 1, 2  do
         -- love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
+        v = PADDLES[i]
         love.graphics.setColor(0, 0, 0, 0.1)
         love.graphics.draw(v.img, v.x + DEPTH, v.y)
         if PADDLE_EFFECT.enabled and PADDLE_EFFECT.hitPaddle == v then
@@ -234,6 +293,11 @@ function love.draw()
         love.graphics.setColor(v.color)
         love.graphics.print(v.score, v.scorePos[1], v.scorePos[2])
     end
+    if STATE == "AI GUIDE" then
+        love.graphics.setColor(1, 1, 1, 0.5)
+        love.graphics.draw(PADDLES[3].img, PADDLES[3].x, PADDLES[3].y)
+    end
+            love.graphics.setColor(1, 1, 1 , 1)
 
     if #BALL.trail >= 4 then
         if LAST_PADDLE then
