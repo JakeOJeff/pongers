@@ -178,9 +178,6 @@ function love.update(dt)
         end
     end
 
-
-
-
     for i, v in ipairs(PADDLES) do
         if love.keyboard.isDown(v.posKey) then
             if v.ranges[1][1] ~= v.ranges[2][1] then v.x = math.min(v.ranges[2][1] - v.w, v.x + v.speed * dt) end
@@ -190,8 +187,6 @@ function love.update(dt)
             if v.ranges[1][2] ~= v.ranges[2][2] then v.y = math.max(v.ranges[1][2], v.y - v.speed * dt) end
         end
     end
-
-
 
     if STATE == "AI" then
         PADDLES[2].y = AI.targetY
@@ -308,8 +303,6 @@ function love.draw()
     love.graphics.rectangle("fill", 0, 0, wW, wH)
     love.graphics.setShader()
     -- love.graphics.setBackgroundColor(0.45098039215686275, 0.8745098039215686, 0.9490196078431372)
-
-    love.graphics.print(BALL.timer)
 
     if TRANSIT then
         for i = 1, TCOUNT do
