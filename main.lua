@@ -136,22 +136,22 @@ function love.update(dt)
         PADDLE_EFFECT.enabled = false
     end
 
-if TRANSIT then
-    TIMER = TIMER + dt
+    if TRANSIT then
+        TIMER = TIMER + dt
 
-    if TIMER < 2 then
-        local t = TIMER / 2
-        for i = 1, TCOUNT do
-            TBLOCKS[i].w = math.sin(t * math.pi) * wW
-        end
-    else
-        TIMER = 0
-        TRANSIT = false
-        for i = 1, TCOUNT do
-            TBLOCKS[i].w = 0
+        if TIMER < 2 then
+            local t = TIMER / 2
+            for i = 1, TCOUNT do
+                TBLOCKS[i].w = math.sin(t * math.pi) * wW
+            end
+        else
+            TIMER = 0
+            TRANSIT = false
+            for i = 1, TCOUNT do
+                TBLOCKS[i].w = 0
+            end
         end
     end
-end
 
 
 
@@ -318,23 +318,25 @@ function love.draw()
         end
         love.graphics.line(BALL.trail)
     end
-    -- love.graphics.circle("fill", BALL.x, BALL.y, BALL.rad)
-    love.graphics.push()
-    love.graphics.translate(-BALL.rad, -BALL.rad)
-    love.graphics.setColor(0, 0, 0, 0.1)
-    love.graphics.draw(BALL_IMG, BALL.x + DEPTH, BALL.y)
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(BALL_IMG, BALL.x, BALL.y)
-    love.graphics.pop()
 
-    love.graphics.line(wW / 2, 0, wW / 2, wH)
-
-    GUI:draw()
 
     if TRANSIT then
         for i = 1, TCOUNT do
             love.graphics.setColor(0, 0, 0)
             love.graphics.rectangle("fill", TBLOCKS[i].x, TBLOCKS[i].y, TBLOCKS[i].w, TBLOCKS[i].h)
         end
+    else
+        -- love.graphics.circle("fill", BALL.x, BALL.y, BALL.rad)
+        love.graphics.push()
+        love.graphics.translate(-BALL.rad, -BALL.rad)
+        love.graphics.setColor(0, 0, 0, 0.1)
+        love.graphics.draw(BALL_IMG, BALL.x + DEPTH, BALL.y)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.draw(BALL_IMG, BALL.x, BALL.y)
+        love.graphics.pop()
+
+        love.graphics.line(wW / 2, 0, wW / 2, wH)
+
+        GUI:draw()
     end
 end
