@@ -114,19 +114,24 @@ function resetState()
         moving = false,
         angle = math.rad(-90),
         speed = 300,
-        trail = {}
+        trail = {},
+        timer = 0
 
     }
     for i, v in ipairs(PADDLES) do
         v.y = 10
     end
+    TRANSIT = true
 end
 
 function love.update(dt)
     if BALL.moving then
-            BALL.timer = BALL.timer + 1 * dt
-
+        BALL.timer = BALL.timer + 1 * dt
+        if BALL.timer > 4 then
+            resetState()
+        end
     end
+
     AI:update(dt)
     GUI:update()
     if #BALL.trail > 50 then
@@ -205,10 +210,6 @@ function bounceBall()
         PADDLES[2].score = PADDLES[2].score + 10
     elseif outOfBounds == 2 then
         PADDLES[1].score = PADDLES[1].score + 10
-    end
-
-    if outOfBounds == 1 or outOfBounds == 2 then
-        TRANSIT = true
     end
 
     if paddleIndex then
@@ -290,41 +291,8 @@ function love.draw()
     love.graphics.rectangle("fill", 0, 0, wW, wH)
     love.graphics.setShader()
     -- love.graphics.setBackgroundColor(0.45098039215686275, 0.8745098039215686, 0.9490196078431372)
-    for i = 1, 2 do
-        -- love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
-        v = PADDLES[i]
-        love.graphics.setColor(0, 0, 0, 0.1)
-        love.graphics.draw(v.img, v.x + DEPTH, v.y)
-        if PADDLE_EFFECT.enabled and PADDLE_EFFECT.hitPaddle == v then
-            love.graphics.setColor(1, 1, 1, 1 - (PADDLE_EFFECT.scale / PADDLE_EFFECT.maxScale))
-            local ox, oy = v.x + v.w / 2, v.y + v.h / 2
-            love.graphics.push()
-            love.graphics.translate(ox, oy)
-            love.graphics.scale(PADDLE_EFFECT.scale, PADDLE_EFFECT.scale)
-            love.graphics.draw(v.img, -v.w / 2, -v.h / 2)
-            love.graphics.pop()
-        end
-        love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.draw(v.img, v.x, v.y)
-        love.graphics.setFont(FONT)
-        love.graphics.setColor(v.colorDark)
-        love.graphics.print(v.score, v.scorePos[1], v.scorePos[2] + 3)
-        love.graphics.setColor(v.color)
-        love.graphics.print(v.score, v.scorePos[1], v.scorePos[2])
-    end
-    if STATE == "AI GUIDE" then
-        love.graphics.setColor(1, 1, 1, 0.5)
-        love.graphics.draw(PADDLES[3].img, PADDLES[3].x, PADDLES[3].y)
-    end
-    love.graphics.setColor(1, 1, 1, 1)
 
-    if #BALL.trail >= 4 then
-        if LAST_PADDLE then
-            love.graphics.setColor(LAST_PADDLE.color)
-        end
-        love.graphics.line(BALL.trail)
-    end
-
+    love.graphics.print(BALL.timer)
 
     if TRANSIT then
         for i = 1, TCOUNT do
@@ -332,6 +300,40 @@ function love.draw()
             love.graphics.rectangle("fill", TBLOCKS[i].x, TBLOCKS[i].y, TBLOCKS[i].w, TBLOCKS[i].h)
         end
     else
+        for i = 1, 2 do
+            -- love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
+            v = PADDLES[i]
+            love.graphics.setColor(0, 0, 0, 0.1)
+            love.graphics.draw(v.img, v.x + DEPTH, v.y)
+            if PADDLE_EFFECT.enabled and PADDLE_EFFECT.hitPaddle == v then
+                love.graphics.setColor(1, 1, 1, 1 - (PADDLE_EFFECT.scale / PADDLE_EFFECT.maxScale))
+                local ox, oy = v.x + v.w / 2, v.y + v.h / 2
+                love.graphics.push()
+                love.graphics.translate(ox, oy)
+                love.graphics.scale(PADDLE_EFFECT.scale, PADDLE_EFFECT.scale)
+                love.graphics.draw(v.img, -v.w / 2, -v.h / 2)
+                love.graphics.pop()
+            end
+            love.graphics.setColor(1, 1, 1, 1)
+            love.graphics.draw(v.img, v.x, v.y)
+            love.graphics.setFont(FONT)
+            love.graphics.setColor(v.colorDark)
+            love.graphics.print(v.score, v.scorePos[1], v.scorePos[2] + 3)
+            love.graphics.setColor(v.color)
+            love.graphics.print(v.score, v.scorePos[1], v.scorePos[2])
+        end
+        if STATE == "AI GUIDE" then
+            love.graphics.setColor(1, 1, 1, 0.5)
+            love.graphics.draw(PADDLES[3].img, PADDLES[3].x, PADDLES[3].y)
+        end
+        love.graphics.setColor(1, 1, 1, 1)
+
+        if #BALL.trail >= 4 then
+            if LAST_PADDLE then
+                love.graphics.setColor(LAST_PADDLE.color)
+            end
+            love.graphics.line(BALL.trail)
+        end
         -- love.graphics.circle("fill", BALL.x, BALL.y, BALL.rad)
         love.graphics.push()
         love.graphics.translate(-BALL.rad, -BALL.rad)
