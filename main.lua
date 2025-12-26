@@ -1,12 +1,12 @@
-    wW, wH = love.graphics.getDimensions()
+wW, wH = love.graphics.getDimensions()
 
-    AI = require("ai")
-    GUI = require("gui")
-    require("ball")
+
 
 function love.load()
     STATE = "AI"
-
+    AI = require("ai")
+    GUI = require("gui")
+    require("ball")
     GAME_START = false
     PADDLE_IMG = love.graphics.newImage("paddle.png")
     PADDLE2_IMG = love.graphics.newImage("paddle2.png")
@@ -25,8 +25,8 @@ function love.load()
     MBLOCKS = {}
     MCOUNT = 100
     MSIZE = wW / MCOUNT
-    MTRANSIT = true
     MTIMER = 0
+    MTRANSIT = false
 
     for i = 1, TCOUNT do
         table.insert(TBLOCKS, {
@@ -38,12 +38,13 @@ function love.load()
     end
     for i = 1, MCOUNT do
         table.insert(MBLOCKS, {
-            x = 0,
-            y = (i - 1) * MSIZE,
-            w = 0,
-            h = MSIZE
+            x = (i - 1) * MSIZE,
+            y = 0,
+            w = MSIZE,
+            h = wH
         })
     end
+
     BALL = {
         x = wW / 2,
         y = wH / 2,
@@ -146,9 +147,9 @@ function resetGame()
     resetState()
     for i, v in ipairs(PADDLES) do
         v.score = 0
-
     end
 end
+
 function love.update(dt)
     if BALL.moving then
         BALL.timer = BALL.timer + 1 * dt
@@ -158,10 +159,10 @@ function love.update(dt)
     end
 
     if BALL.moving then
-    local offset = 1 - (math.abs(BALL.x - wW / 2) / (wW / 2))
-    offset = math.max(0, offset)
+        local offset = 1 - (math.abs(BALL.x - wW / 2) / (wW / 2))
+        offset = math.max(0, offset)
 
-    HEIGHT_FACTOR = offset * 10  -- tweak this number
+        HEIGHT_FACTOR = offset * 10 -- tweak this number
     end
 
     AI:update(dt)
@@ -194,22 +195,46 @@ function love.update(dt)
             end
         end
     end
+    local function easeInOutCubic(t)
+        if t < 0.5 then
+            return 4 * t * t * t
+        else
+            return 1 - math.pow(-2 * t + 2, 3) / 2
+        end
+    end
     if MTRANSIT then
         MTIMER = MTIMER + dt
+        local duration = 1.6
+        local t = math.min(MTIMER / duration, 1)
+        local eased = easeInOutCubic(t)
 
-        if MTIMER < 2 then
-            local t = TIMER / 2
-            for i = 1, TCOUNT do
-                MBLOCKS[i].h = math.sin(t * math.pi + i * 0.001) * wH
+        for i = 1, MCOUNT do
+            local phase = (i - 1) / MCOUNT -- 0 → 1 across screen
+            local delay = phase * 0.35     -- wave delay
+            local localT = math.max(0, eased - delay)
+
+            MBLOCKS[i].h = wH * (1 - localT)
+        end
+
+        if t >= 1 then
+            local finished = true
+            local speed = wH / 0.4     -- finishes in 0.4s
+
+
+            for i = 1, MCOUNT do
+                MBLOCKS[i].h = math.max(MBLOCKS[i].h - speed * dt, 0)
+                if MBLOCKS[i].h > 0 then
+                    finished = false
+                end
             end
-        else
-            MTIMER = 0
-            MTRANSIT = false
-            for i = 1, TCOUNT do
-                TBLOCKS[i].h = 0
+
+            if finished then
+                MTRANSIT = false
             end
         end
     end
+
+
     for i, v in ipairs(PADDLES) do
         if love.keyboard.isDown(v.posKey) then
             if v.ranges[1][1] ~= v.ranges[2][1] then v.x = math.min(v.ranges[2][1] - v.w, v.x + v.speed * dt) end
@@ -249,6 +274,13 @@ function love.keypressed(key)
         BALL.moving = not BALL.moving
     elseif key == "r" then
         resetGame()
+    elseif key == "escape" then
+        MTRANSIT = true
+        MTIMER = 0
+
+        for i = 1, MCOUNT do
+            MBLOCKS[i].h = wH -- FULL BLACK
+        end
     end
 end
 
@@ -305,7 +337,7 @@ function love.draw()
         love.graphics.push()
         love.graphics.translate(-BALL.rad, -BALL.rad)
         love.graphics.setColor(0, 0, 0, 0.1)
-        love.graphics.draw(BALL_IMG, BALL.x + DEPTH + HEIGHT_FACTOR, BALL.y  + DEPTH + HEIGHT_FACTOR)
+        love.graphics.draw(BALL_IMG, BALL.x + DEPTH + HEIGHT_FACTOR, BALL.y + DEPTH + HEIGHT_FACTOR)
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(BALL_IMG, BALL.x, BALL.y)
         love.graphics.pop()
@@ -315,10 +347,14 @@ function love.draw()
         GUI:draw()
     end
 
-    if MTRANSIT then
-                for i = 1, MCOUNT do
-            love.graphics.setColor(0, 0, 0)
-            love.graphics.rectangle("fill", TBLOCKS[i].x, TBLOCKS[i].y, TBLOCKS[i].w, TBLOCKS[i].h)
-        end
+    for i = 1, MCOUNT do
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.rectangle(
+            "fill",
+            MBLOCKS[i].x,
+            MBLOCKS[i].y,
+            MBLOCKS[i].w,
+            MBLOCKS[i].h
+        )
     end
 end
