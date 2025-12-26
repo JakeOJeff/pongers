@@ -7,7 +7,7 @@ function love.load()
     PADDLE_IMG = love.graphics.newImage("paddle.png")
     PADDLE2_IMG = love.graphics.newImage("paddle2.png")
     BALL_IMG = love.graphics.newImage("ball.png")
-    DEPTH = -15
+    DEPTH = 5
     HEIGHT_FACTOR = 0
     FONT = love.graphics.newFont("vcr.ttf", 30)
     bgShader = love.graphics.newShader("background.glsl")
@@ -140,10 +140,12 @@ function love.update(dt)
         end
     end
 
+    if BALL.moving then
     local offset = 1 - (math.abs(BALL.x - wW / 2) / (wW / 2))
     offset = math.max(0, offset)
 
-    local HEIGHT_FACTOR = offset * 20  -- tweak this number
+    HEIGHT_FACTOR = offset * 10  -- tweak this number
+    end
 
     AI:update(dt)
     GUI:update()
@@ -319,7 +321,7 @@ function love.draw()
             -- love.graphics.rectangle("fill", v.x, v.y, v.w, v.h, 10, 10)
             v = PADDLES[i]
             love.graphics.setColor(0, 0, 0, 0.1)
-            love.graphics.draw(v.img, v.x + DEPTH, v.y)
+            love.graphics.draw(v.img, v.x + DEPTH, v.y + DEPTH)
             if PADDLE_EFFECT.enabled and PADDLE_EFFECT.hitPaddle == v then
                 love.graphics.setColor(1, 1, 1, 1 - (PADDLE_EFFECT.scale / PADDLE_EFFECT.maxScale))
                 local ox, oy = v.x + v.w / 2, v.y + v.h / 2
@@ -353,7 +355,7 @@ function love.draw()
         love.graphics.push()
         love.graphics.translate(-BALL.rad, -BALL.rad)
         love.graphics.setColor(0, 0, 0, 0.1)
-        love.graphics.draw(BALL_IMG, BALL.x + DEPTH + HEIGHT_FACTOR, BALL.y)
+        love.graphics.draw(BALL_IMG, BALL.x + DEPTH + HEIGHT_FACTOR, BALL.y  + DEPTH + HEIGHT_FACTOR)
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(BALL_IMG, BALL.x, BALL.y)
         love.graphics.pop()
