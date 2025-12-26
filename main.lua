@@ -12,7 +12,7 @@ function love.load()
     bgShader = love.graphics.newShader("background.glsl")
 
     TBLOCKS = {}
-    TCOUNT = 20
+    TCOUNT = 100
     TSIZE = wH / TCOUNT
     TRANSIT = false
     TIMER = 0
@@ -142,7 +142,7 @@ function love.update(dt)
         if TIMER < 2 then
             local t = TIMER / 2
             for i = 1, TCOUNT do
-                TBLOCKS[i].w = math.sin(t * math.pi) * wW
+                TBLOCKS[i].w = math.sin(t * math.pi + i * 0.001) * wW
             end
         else
             TIMER = 0
