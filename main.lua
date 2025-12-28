@@ -15,7 +15,7 @@ function love.load()
     HEIGHT_FACTOR = 0
     FONT = love.graphics.newFont("vcr.ttf", 30)
         FONT2 = love.graphics.newFont("vcr.ttf", 50)
-            FONT3 = love.graphics.newFont("vcr.ttf", 90)
+            FONT3 = love.graphics.newFont("vcr.ttf", 120)
 
 
     bgShader = love.graphics.newShader("background.glsl")
@@ -352,6 +352,9 @@ function love.draw()
 
     if MFADE == "MENU" then
         love.graphics.setColor(1,1,1,1)
+
+        love.graphics.setFont(FONT3)
+        love.graphics.print("PONGERS", wW/2 - FONT3:getWidth("PONGERS")/2, 100)
         love.graphics.setFont(FONT2)
         love.graphics.print("PLAY", wW/2 - FONT2:getWidth("PLAY")/2, wH/2 - FONT2:getHeight()/2)
     end
