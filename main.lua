@@ -14,8 +14,8 @@ function love.load()
     DEPTH = 5
     HEIGHT_FACTOR = 0
     FONT = love.graphics.newFont("vcr.ttf", 30)
-        FONT2 = love.graphics.newFont("vcr.ttf", 50)
-            FONT3 = love.graphics.newFont("vcr.ttf", 120)
+    FONT2 = love.graphics.newFont("vcr.ttf", 50)
+    FONT3 = love.graphics.newFont("vcr.ttf", 120)
 
 
     bgShader = love.graphics.newShader("background.glsl")
@@ -33,7 +33,7 @@ function love.load()
     MTRANSIT = false
 
     MFADE = "MENU"
-
+MALPHA = 1
     for i = 1, TCOUNT do
         table.insert(TBLOCKS, {
             x = 0,
@@ -171,6 +171,13 @@ function love.update(dt)
         HEIGHT_FACTOR = offset * 10 -- tweak this number
     end
 
+    if MFADE == "FADEOUT" then
+        MALPHA = math.max(0, MALPHA - 1 * dt)
+        if MALPHA <= 0 then
+            MFADE = "TRANSITION"
+        end
+    end
+
     AI:update(dt)
     GUI:update()
     if #BALL.trail > 50 then
@@ -209,15 +216,15 @@ function love.update(dt)
         end
     end
     if MTRANSIT then
-       MTIMER = MTIMER + 1 * dt
-       for i = 1, #MBLOCKS do
+        MTIMER = MTIMER + 1 * dt
+        for i = 1, #MBLOCKS do
             if i <= MTIMER * 100 then
                 MBLOCKS[i].h = MBLOCKS[i].h - 1200 * dt
             end
-       end
-       if MBLOCKS[#MBLOCKS].h <= 0 then
+        end
+        if MBLOCKS[#MBLOCKS].h <= 0 then
             MTRANSIT = false
-       end
+        end
     end
 
 
@@ -253,6 +260,11 @@ end
 
 function love.mousepressed(x, y, button)
     GUI:mousepressed(x, y, button)
+    local playX = wW/2 - FONT2:getWidth("PLAY")/2
+    local playY = wH/2 - FONT2:getHeight()/2
+    if x > playX and x < playX + FONT2:getWidth() and y > playY and y < playY + FONT2:getHeight() then
+        MFADE = "FADEOUT"
+    end
 end
 
 function love.keypressed(key)
@@ -333,7 +345,7 @@ function love.draw()
         GUI:draw()
     end
 
-    
+
 
     for i = 1, MCOUNT do
         if i % 2 == 1 then
@@ -351,11 +363,11 @@ function love.draw()
     end
 
     if MFADE == "MENU" then
-        love.graphics.setColor(1,1,1,1)
+        love.graphics.setColor(1, 1, 1, MALPHA)
 
         love.graphics.setFont(FONT3)
-        love.graphics.print("PONGERS", wW/2 - FONT3:getWidth("PONGERS")/2, 100)
+        love.graphics.print("PONGERS", wW / 2 - FONT3:getWidth("PONGERS") / 2, 100)
         love.graphics.setFont(FONT2)
-        love.graphics.print("PLAY", wW/2 - FONT2:getWidth("PLAY")/2, wH/2 - FONT2:getHeight()/2)
+        love.graphics.print("PLAY", wW / 2 - FONT2:getWidth("PLAY") / 2, wH / 2 - FONT2:getHeight() / 2)
     end
 end
