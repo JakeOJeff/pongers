@@ -14,6 +14,10 @@ function love.load()
     DEPTH = 5
     HEIGHT_FACTOR = 0
     FONT = love.graphics.newFont("vcr.ttf", 30)
+        FONT2 = love.graphics.newFont("vcr.ttf", 50)
+            FONT3 = love.graphics.newFont("vcr.ttf", 90)
+
+
     bgShader = love.graphics.newShader("background.glsl")
 
     TBLOCKS = {}
@@ -27,6 +31,8 @@ function love.load()
     MSIZE = wW / MCOUNT
     MTIMER = 0
     MTRANSIT = false
+
+    MFADE = "MENU"
 
     for i = 1, TCOUNT do
         table.insert(TBLOCKS, {
@@ -327,8 +333,14 @@ function love.draw()
         GUI:draw()
     end
 
+    
+
     for i = 1, MCOUNT do
-        love.graphics.setColor(0, 0, 0, 1)
+        if i % 2 == 1 then
+            love.graphics.setColor(0.451, 0.875, 0.949)
+        else
+            love.graphics.setColor(0.351, 0.775, 0.849)
+        end
         love.graphics.rectangle(
             "fill",
             MBLOCKS[i].x,
@@ -336,5 +348,11 @@ function love.draw()
             MBLOCKS[i].w,
             MBLOCKS[i].h
         )
+    end
+
+    if MFADE == "MENU" then
+        love.graphics.setColor(1,1,1,1)
+        love.graphics.setFont(FONT2)
+        love.graphics.print("PLAY", wW/2 - FONT2:getWidth("PLAY")/2, wH/2 - FONT2:getHeight()/2)
     end
 end
