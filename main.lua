@@ -17,6 +17,7 @@ function love.load()
     FONT2 = love.graphics.newFont("vcr.ttf", 50)
     FONT3 = love.graphics.newFont("vcr.ttf", 120)
 
+    hoverPlay = 1
 
     bgShader = love.graphics.newShader("background.glsl")
 
@@ -163,7 +164,7 @@ function love.update(dt)
             resetState()
         end
     end
-
+ 
     if BALL.moving then
         local offset = 1 - (math.abs(BALL.x - wW / 2) / (wW / 2))
         offset = math.max(0, offset)
@@ -176,6 +177,8 @@ function love.update(dt)
         if MALPHA <= 0 then
             MFADE = "TRANSITION"
         end
+    elseif MFADE == "TRANSITION"  then
+        MTRANSIT = true
     end
 
     AI:update(dt)
@@ -208,13 +211,7 @@ function love.update(dt)
             end
         end
     end
-    local function easeInOutCubic(t)
-        if t < 0.5 then
-            return 4 * t * t * t
-        else
-            return 1 - math.pow(-2 * t + 2, 3) / 2
-        end
-    end
+
     if MTRANSIT then
         MTIMER = MTIMER + 1 * dt
         for i = 1, #MBLOCKS do
@@ -224,6 +221,7 @@ function love.update(dt)
         end
         if MBLOCKS[#MBLOCKS].h <= 0 then
             MTRANSIT = false
+            MFADE = "GAME"
         end
     end
 
@@ -256,13 +254,22 @@ function love.update(dt)
     table.insert(BALL.trail, BALL.x)
     table.insert(BALL.trail, BALL.y)
     bounceBall()
+
+    local mx, my = love.mouse.getPosition()
+    local playX = wW/2 - FONT2:getWidth("PLAY")/2
+    local playY = wH/2 - FONT2:getHeight()/2 + 40
+    if mx > playX and mx < playX + FONT2:getWidth("PLAY") and my > playY and my < playY + FONT2:getHeight() then
+        hoverPlay = 0
+    else
+        hoverPlay = 1
+    end
 end
 
 function love.mousepressed(x, y, button)
     GUI:mousepressed(x, y, button)
     local playX = wW/2 - FONT2:getWidth("PLAY")/2
-    local playY = wH/2 - FONT2:getHeight()/2
-    if x > playX and x < playX + FONT2:getWidth() and y > playY and y < playY + FONT2:getHeight() then
+    local playY = wH/2 - FONT2:getHeight()/2 + 40
+    if x > playX and x < playX + FONT2:getWidth("PLAY") and y > playY and y < playY + FONT2:getHeight() then
         MFADE = "FADEOUT"
     end
 end
@@ -362,12 +369,13 @@ function love.draw()
         )
     end
 
-    if MFADE == "MENU" then
+    if MFADE == "MENU" or MFADE == "FADEOUT" then
         love.graphics.setColor(1, 1, 1, MALPHA)
 
         love.graphics.setFont(FONT3)
         love.graphics.print("PONGERS", wW / 2 - FONT3:getWidth("PONGERS") / 2, 100)
         love.graphics.setFont(FONT2)
-        love.graphics.print("PLAY", wW / 2 - FONT2:getWidth("PLAY") / 2, wH / 2 - FONT2:getHeight() / 2)
+        love.graphics.setColor(hoverPlay, 1, hoverPlay)
+        love.graphics.print("PLAY", wW / 2 - FONT2:getWidth("PLAY") / 2, wH / 2 - FONT2:getHeight() / 2 + 40)
     end
 end
