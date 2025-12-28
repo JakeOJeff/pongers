@@ -203,35 +203,15 @@ function love.update(dt)
         end
     end
     if MTRANSIT then
-        MTIMER = MTIMER + dt
-        local duration = 1.6
-        local t = math.min(MTIMER / duration, 1)
-        local eased = easeInOutCubic(t)
-
-        for i = 1, MCOUNT do
-            local phase = (i - 1) / MCOUNT -- 0 → 1 across screen
-            local delay = phase * 0.35     -- wave delay
-            local localT = math.max(0, eased - delay)
-
-            MBLOCKS[i].h = wH * (1 - localT)
-        end
-
-        if t >= 1 then
-            local finished = true
-            local speed = wH / 0.4     -- finishes in 0.4s
-
-
-            for i = 1, MCOUNT do
-                MBLOCKS[i].h = math.max(MBLOCKS[i].h - speed * dt, 0)
-                if MBLOCKS[i].h > 0 then
-                    finished = false
-                end
+       MTIMER = MTIMER + 1 * dt
+       for i = 1, #MBLOCKS do
+            if i <= MTIMER * 100 then
+                MBLOCKS[i].h = MBLOCKS[i].h - 1200 * dt
             end
-
-            if finished then
-                MTRANSIT = false
-            end
-        end
+       end
+       if MBLOCKS[#MBLOCKS].h <= 0 then
+            MTRANSIT = false
+       end
     end
 
 
