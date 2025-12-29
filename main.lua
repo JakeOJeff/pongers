@@ -18,6 +18,7 @@ function love.load()
     FONT3 = love.graphics.newFont("vcr.ttf", 120)
 
     hoverPlay = 1
+    hoverScalePlay = 0
 
     bgShader = love.graphics.newShader("background.glsl")
 
@@ -34,7 +35,7 @@ function love.load()
     MTRANSIT = false
 
     MFADE = "MENU"
-MALPHA = 1
+    MALPHA = 1
     for i = 1, TCOUNT do
         table.insert(TBLOCKS, {
             x = 0,
@@ -164,7 +165,7 @@ function love.update(dt)
             resetState()
         end
     end
- 
+
     if BALL.moving then
         local offset = 1 - (math.abs(BALL.x - wW / 2) / (wW / 2))
         offset = math.max(0, offset)
@@ -177,7 +178,7 @@ function love.update(dt)
         if MALPHA <= 0 then
             MFADE = "TRANSITION"
         end
-    elseif MFADE == "TRANSITION"  then
+    elseif MFADE == "TRANSITION" then
         MTRANSIT = true
     end
 
@@ -256,19 +257,21 @@ function love.update(dt)
     bounceBall()
 
     local mx, my = love.mouse.getPosition()
-    local playX = wW/2 - FONT2:getWidth("PLAY")/2
-    local playY = wH/2 - FONT2:getHeight()/2 + 40
+    local playX = wW / 2 - FONT2:getWidth("PLAY") / 2
+    local playY = wH / 2 - FONT2:getHeight() / 2 + 40
     if mx > playX and mx < playX + FONT2:getWidth("PLAY") and my > playY and my < playY + FONT2:getHeight() then
         hoverPlay = 0
+        hoverScalePlay = math.min(1, hoverScalePlay + 2 * dt)
     else
         hoverPlay = 1
+        hoverScalePlay = math.max(0, hoverScalePlay - 2 * dt)
     end
 end
 
 function love.mousepressed(x, y, button)
     GUI:mousepressed(x, y, button)
-    local playX = wW/2 - FONT2:getWidth("PLAY")/2
-    local playY = wH/2 - FONT2:getHeight()/2 + 40
+    local playX = wW / 2 - FONT2:getWidth("PLAY") / 2
+    local playY = wH / 2 - FONT2:getHeight() / 2 + 40
     if x > playX and x < playX + FONT2:getWidth("PLAY") and y > playY and y < playY + FONT2:getHeight() then
         MFADE = "FADEOUT"
     end
@@ -372,12 +375,25 @@ function love.draw()
     if MFADE == "MENU" or MFADE == "FADEOUT" then
         love.graphics.setColor(1, 1, 1, MALPHA)
 
-        
-        love.graphics.draw(PADDLE_IMG)
+
+        love.graphics.push()
+        love.graphics.translate(50 + 10 * hoverScalePlay, wH - 200 - 20 * hoverScalePlay)
+        love.graphics.scale(2.5, 2.5)
+        love.graphics.rotate(math.rad(30))
+        love.graphics.draw(PADDLE_IMG, 0, 0)
+        love.graphics.pop()
+
         love.graphics.setFont(FONT3)
+        love.graphics.setColor(0, 0, 0, MALPHA)
+        love.graphics.print("PONGERS", wW / 2 - FONT3:getWidth("PONGERS") / 2, 102 + 2 * hoverScalePlay)
+        love.graphics.setColor(1, 1, 1, MALPHA)
+
         love.graphics.print("PONGERS", wW / 2 - FONT3:getWidth("PONGERS") / 2, 100)
         love.graphics.setFont(FONT2)
-        love.graphics.setColor(hoverPlay, 1, hoverPlay, MALPHA)
+        love.graphics.rectangle("fill", wW / 2 - FONT2:getWidth("PLAY") / 2,
+            wH / 2 - FONT2:getHeight() / 2 + 40 + FONT2:getHeight(), FONT2:getWidth("PLAY"),
+            FONT2:getHeight() * -hoverScalePlay)
+        love.graphics.setColor(1 - hoverScalePlay, 1, 1 - hoverScalePlay, MALPHA)
         love.graphics.print("PLAY", wW / 2 - FONT2:getWidth("PLAY") / 2, wH / 2 - FONT2:getHeight() / 2 + 40)
     end
 end
