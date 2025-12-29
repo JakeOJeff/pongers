@@ -280,12 +280,12 @@ function love.keypressed(key)
     elseif key == "r" then
         resetGame()
     elseif key == "escape" then
-        MTRANSIT = true
-        MTIMER = 0
+        -- MTRANSIT = true
+        -- MTIMER = 0
 
-        for i = 1, MCOUNT do
-            MBLOCKS[i].h = wH -- FULL BLACK
-        end
+        -- for i = 1, MCOUNT do
+        --     MBLOCKS[i].h = wH -- FULL BLACK
+        -- end
     end
 end
 
@@ -372,10 +372,12 @@ function love.draw()
     if MFADE == "MENU" or MFADE == "FADEOUT" then
         love.graphics.setColor(1, 1, 1, MALPHA)
 
+        
+        love.graphics.draw(PADDLE_IMG)
         love.graphics.setFont(FONT3)
         love.graphics.print("PONGERS", wW / 2 - FONT3:getWidth("PONGERS") / 2, 100)
         love.graphics.setFont(FONT2)
-        love.graphics.setColor(hoverPlay, 1, hoverPlay)
+        love.graphics.setColor(hoverPlay, 1, hoverPlay, MALPHA)
         love.graphics.print("PLAY", wW / 2 - FONT2:getWidth("PLAY") / 2, wH / 2 - FONT2:getHeight() / 2 + 40)
     end
 end
