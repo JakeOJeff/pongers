@@ -383,6 +383,13 @@ function love.draw()
         love.graphics.draw(PADDLE_IMG, 0, 0)
         love.graphics.pop()
 
+        love.graphics.push()
+        love.graphics.translate(wW - 110 - 10 * hoverScalePlay, wH - 160 - 20 * hoverScalePlay)
+        love.graphics.scale(2.5, 2.5)
+        love.graphics.rotate(math.rad(-30))
+        love.graphics.draw(PADDLE2_IMG, 0, 0)
+        love.graphics.pop()
+
         love.graphics.setFont(FONT3)
         love.graphics.setColor(0, 0, 0, MALPHA)
         love.graphics.print("PONGERS", wW / 2 - FONT3:getWidth("PONGERS") / 2, 102 + 2 * hoverScalePlay)
