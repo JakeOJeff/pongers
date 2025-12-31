@@ -6,6 +6,7 @@ function love.load()
     STATE = "AI"
     AI = require("ai")
     GUI = require("gui")
+    AUDIO = require("audio")
     require("ball")
     GAME_START = false
     PADDLE_IMG = love.graphics.newImage("paddle.png")
