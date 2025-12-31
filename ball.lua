@@ -52,6 +52,8 @@ function checkBallCollision()
 
         if distanceSquared < BALL.rad * BALL.rad then
             BALL.timer = 0
+                        AUDIO.paddle:stop()
+            AUDIO.paddle:play()
             return i
         end
     end
@@ -68,8 +70,12 @@ end
 
 function checkOutOfBounds()
     if BALL.x > wW then
+                AUDIO.death:play()
+
         return 2
     elseif BALL.x < 0 then
+                AUDIO.death:play()
+
         return 1
     end
 end

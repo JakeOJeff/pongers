@@ -1,7 +1,7 @@
 local audio = {
-    paddle = love.graphics.newAudio("sfx/hit.mp3"),
-    death = love.graphics.newAudio("sfx/death.mp3"),
-    bgm = love.graphics.newAudio("sfx/bgm.mp3")
+    paddle = love.audio.newSource("sfx/hit.mp3", "static"),
+    death = love.audio.newSource("sfx/death.mp3", "static"),
+    bgm = love.audio.newSource("sfx/bgm.mp3", "stream")
 
 }
 

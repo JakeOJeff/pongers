@@ -224,8 +224,10 @@ function love.update(dt)
         if MBLOCKS[#MBLOCKS].h <= 0 then
             MTRANSIT = false
             MFADE = "GAME"
+            AUDIO.bgm:play()
         end
     end
+
 
 
     for i, v in ipairs(PADDLES) do
