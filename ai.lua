@@ -5,12 +5,7 @@ local ai = {
 }
 
 function ai:update(dt)
-        self.targetY = BALL.y + math.tan(BALL.angle) * (BALL.x - PADDLES[self.paddleId].x)
-        if self.targetY > wH - PADDLES[self.paddleId].h - 10 then
-            self.targetY = wH - PADDLES[self.paddleId].h - 10
-        elseif self.targetY < 10 then
-            self.targetY = 10
-        end
+        self.targetY = math.min(wH - PADDLES[self.paddleId].h - 10,math.max(10, BALL.y + math.tan(BALL.angle) * (BALL.x - PADDLES[self.paddleId].x)))
 end
 
 return ai
